@@ -5,6 +5,7 @@
  * @property {String}     name         Name
  * @property {String}     description  Description
  * @property {Boolean}    important    Is this project marked as important?
+ * @property {String}     source       Source of this task ("internal", "redmine", "gitlab", "jira", etc)
  * @property {Date}       createdAt    Date of creation
  * @property {Date}       updatedAt    Last update timestamp
  * @property {Date|null}  deletedAt    Removal timestamp
@@ -35,6 +36,7 @@ class CattrProjects {
       name: raw.name,
       description: raw.description,
       important: Boolean(raw.important),
+      source: String(raw.source),
       createdAt: new Date(raw.created_at),
       updatedAt: new Date(raw.updated_at),
       deletedAt: raw.deleted_at ? new Date(raw.deleted_at) : null

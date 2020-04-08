@@ -84,6 +84,29 @@ class CattrTasks {
 
   }
 
+  async create(opts) {
+
+    if (opts && typeof opts !== 'object')
+      throw new TypeError(`Properties of the new task must be passed as Object, but ${typeof opts} given`);
+
+    const res = await this.$.post(`api/${this.$.apiVersion}/tasks/create`, opts || {});
+    if (!res.success) {
+
+      if (res.isNetworkError)
+        throw new this.$.NetworkError(res);
+
+      throw new this.$.ApiError(
+        res.error.response.status,
+        res.error.response.data.error_type || 'unknown',
+        res.error.response.data.message || 'Unknown message',
+      );
+
+    }
+
+    return res.response.data.map(CattrTasks.represent);
+
+  }
+
 }
 
 module.exports = CattrTasks;
