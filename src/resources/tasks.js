@@ -80,7 +80,7 @@ class CattrTasks {
 
     }
 
-    return res.response.data.map(CattrTasks.represent);
+    return res.response.data;
 
   }
 
@@ -103,7 +103,7 @@ class CattrTasks {
 
     }
 
-    return res.response.data.map(CattrTasks.represent);
+    return res.response.data;
 
   }
 
