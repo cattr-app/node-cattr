@@ -7,8 +7,9 @@ const FormData = require('form-data');
  * @property {Number} userId    ID of the related user
  * @property {Date}   start     Date object representing start of the interval
  * @property {Date}   end       Date object representing end of the interval
- * @property {Number} mouse     Amount of mouse events
- * @property {Number} keyboard  Amount of keyboard events
+ * @property {Number|null} mouseActivity    Percent of time of mouse activity
+ * @property {Number|null} keyboardActivity Percent of time of keyboard activity
+ * @property {Number} systemActivity  Percent of time of system reported activity
  */
 
 /**
@@ -19,8 +20,9 @@ const FormData = require('form-data');
  * @property {Number} userId    ID of the related user
  * @property {Date}   start     Date object representing start of the interval
  * @property {Date}   end       Date object representing end of the interval
- * @property {Number} mouse     Amount of mouse events
- * @property {Number} keyboard  Amount of keyboard events
+ * @property {Number|null} mouseActivity    Percent of time of mouse activity
+ * @property {Number|null} keyboardActivity Percent of time of keyboard activity
+ * @property {Number} systemActivity  Percent of time of system reported activity
  * @property {Date}   createdAt Date of creation
  * @property {Date}   updatedAt Date of last update
  */
@@ -50,11 +52,53 @@ class CattrIntervals {
       userId: Number(raw.user_id),
       start: new Date(raw.start_at),
       end: new Date(raw.end_at),
-      mouse: Number(raw.count_mouse),
-      keyboard: Number(raw.count_keyboard),
+      systemActivity: Number(raw.activity_fill),
+      mouseActivity: Number(raw.mouse_fill) || null,
+      keyboardActivity: Number(raw.keyboard_fill) || null,
       createdAt: new Date(raw.created_at),
       updatedAt: new Date(raw.updated_at)
     };
+
+  }
+
+  /**
+   * Creates interval
+   * @async
+   * @param {IntervalPushDTO} interval Properties of the interval
+   */
+  async create(interval) {
+
+    if (typeof interval !== 'object')
+      throw new TypeError(`Interval DTO must be an object, but ${typeof intervalId} is given`);
+
+    const reqData = new FormData();
+    reqData.append('task_id', interval.taskId);
+    reqData.append('user_id', interval.userId);
+    reqData.append('start_at', interval.start.toISOString());
+    reqData.append('end_at', interval.end.toISOString());
+    reqData.append('activity_fill', interval.systemActivity);
+
+    if (interval.keyboardActivity)
+      reqData.append('keyboard_fill', interval.keyboardActivity);
+
+    if (interval.mouseActivity)
+      reqData.append('mouse_fill', interval.mouseActivity);
+
+    const res = await this.$.post(`api/${this.$.apiVersion}/time-intervals/create`, reqData, { headers: reqData.getHeaders() });
+    if (!res.success) {
+
+      if (res.isNetworkError)
+        throw new this.$.NetworkError(res);
+
+      throw new this.$.ApiError(
+        res.error.response.status,
+        res.error.response.data.error_type || 'unknown',
+        res.error.response.data.message || 'Unknown message',
+      );
+
+    }
+
+    return CattrIntervals.represent(res.response.data.interval);
 
   }
 
@@ -77,9 +121,14 @@ class CattrIntervals {
     reqData.append('user_id', interval.userId);
     reqData.append('start_at', interval.start.toISOString());
     reqData.append('end_at', interval.end.toISOString());
-    reqData.append('count_mouse', interval.mouse);
-    reqData.append('count_keyboard', interval.keyboard);
+    reqData.append('activity_fill', interval.systemActivity);
     reqData.append('screenshot', screenshot, { filename: 'screenshot.jpeg' });
+
+    if (interval.keyboardActivity)
+      reqData.append('keyboard_fill', interval.keyboardActivity);
+
+    if (interval.mouseActivity)
+      reqData.append('mouse_fill', interval.mouseActivity);
 
     const res = await this.$.post(`api/${this.$.apiVersion}/time-intervals/create`, reqData, { headers: reqData.getHeaders() });
     if (!res.success) {
