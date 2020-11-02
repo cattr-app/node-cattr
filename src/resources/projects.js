@@ -56,7 +56,7 @@ class CattrProjects {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Projects filtering options must be an Object, but ${typeof opts} given`);
 
-    const res = await this.$.post(`api/${this.$.apiVersion}/projects/list`, opts || {});
+    const res = await this.$.post(`api/projects/list`, opts || {});
     if (!res.success) {
 
       if (res.isNetworkError)

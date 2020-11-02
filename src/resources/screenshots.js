@@ -59,7 +59,7 @@ class CattrScreenshots {
     reqData.append('time_interval_id', intervalId);
     reqData.append('screenshot', screenshot, { filename: 'screenshot.jpeg' });
 
-    const res = await this.$.post(`api/${this.$.apiVersion}/screenshots/create`, reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post(`api/screenshots/create`, reqData, { headers: reqData.getHeaders() });
     if (!res.success) {
 
       if (res.isNetworkError)

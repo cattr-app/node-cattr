@@ -66,7 +66,7 @@ class CattrTasks {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Tasks filtering options must be an Object, but ${typeof opts} given`);
 
-    const res = await this.$.post(`api/${this.$.apiVersion}/tasks/list`, opts || {});
+    const res = await this.$.post(`api/tasks/list`, opts || {});
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -89,7 +89,7 @@ class CattrTasks {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Properties of the new task must be passed as Object, but ${typeof opts} given`);
 
-    const res = await this.$.post(`api/${this.$.apiVersion}/tasks/create`, opts || {});
+    const res = await this.$.post(`api/tasks/create`, opts || {});
     if (!res.success) {
 
       if (res.isNetworkError)

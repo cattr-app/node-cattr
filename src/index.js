@@ -31,9 +31,8 @@ class Cattr {
 
   /**
    * Creates Cattr API instance
-   * @param {String} [version='v1'] API version
    */
-  constructor(version = 'v1') {
+  constructor() {
 
     /**
      * Link to extended Error class
@@ -69,12 +68,6 @@ class Cattr {
      * @type {Object}
      */
     this.axios = null;
-
-    /**
-     * API version
-     * @type {String}
-     */
-    this.apiVersion = (typeof version === 'string') ? version : 'v1';
 
     /**
      * Axios instance configuration
