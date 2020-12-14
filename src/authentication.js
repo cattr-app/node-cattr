@@ -130,7 +130,7 @@ module.exports = $ => {
     if (typeof password !== 'string' || password.length === 0)
       throw new TypeError('Incorrect password parameter given');
 
-    const res = await $.post('api/auth/login', { email, password }, { noAuth: true });
+    const res = await $.post('auth/login', { email, password }, { noAuth: true });
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -148,8 +148,8 @@ module.exports = $ => {
     }
 
     // Double-check that response is successfull
-    if (res.response.data.success !== true)
-      throw new $.ApiError(0, 'unexpected_structure', 'Incorrect response structure');
+    /* if (res.response.data.success !== true)
+      throw new $.ApiError(0, 'unexpected_structure', `${JSON.stringify(res.response.data)}`); */
 
     return {
       token: {
@@ -169,7 +169,7 @@ module.exports = $ => {
    */
   ops.me = async () => {
 
-    const res = await $.get('api/auth/me', {});
+    const res = await $.get('auth/me', {});
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -186,8 +186,8 @@ module.exports = $ => {
 
     }
 
-    if (!res.response.data.success || typeof res.response.data.user !== 'object')
-      throw new $.ApiError(0, 'unexpected_structure', 'Incorrect response structure');
+    /* if (!res.response.data.success || typeof res.response.data.user !== 'object')
+      throw new $.ApiError(0, 'unexpected_structure', 'Incorrect response structure');  */
 
     return userFormatter(res.response.data.user);
 
@@ -201,7 +201,7 @@ module.exports = $ => {
    */
   ops.logout = async (fromAll = false) => {
 
-    const endpoint = (fromAll === true) ? 'api/auth/logout-from-all' : 'api/auth/logout';
+    const endpoint = (fromAll === true) ? 'auth/logout-from-all' : 'auth/logout';
     const req = await $.post(endpoint, {}, { noRelogin: true });
     if (!req.success) {
 
@@ -231,7 +231,7 @@ module.exports = $ => {
    */
   ops.refresh = async (relogin = false) => {
 
-    const req = await $.post('api/auth/refresh', {}, { noRelogin: !relogin });
+    const req = await $.post('auth/refresh', {}, { noRelogin: !relogin });
     if (!req.success) {
 
       if (req.isNetworkError)
@@ -249,7 +249,7 @@ module.exports = $ => {
     }
 
     if (
-      !req.response.data.success ||
+      //!req.response.data.success ||
       typeof req.response.data.access_token !== 'string' ||
       typeof req.response.data.token_type !== 'string' ||
       typeof req.response.data.expires_in !== 'string'
