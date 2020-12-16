@@ -60,7 +60,7 @@ class CattrTime {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Total time filtering options must be an Object, but ${typeof opts} given`);
 
-    const res = await this.$.post(`time/total`, opts || {});
+    const res = await this.$.post('time/total', opts || {});
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -93,7 +93,7 @@ class CattrTime {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Total time filtering options must be an Object, but ${typeof opts} given`);
 
-    const res = await this.$.post(`time/tasks`, opts || {});
+    const res = await this.$.post('time/tasks', opts || {});
     if (!res.success) {
 
       if (res.isNetworkError)

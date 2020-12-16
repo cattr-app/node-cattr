@@ -84,7 +84,7 @@ class CattrIntervals {
     if (interval.mouseActivity)
       reqData.append('mouse_fill', interval.mouseActivity);
 
-    const res = await this.$.post(`time-intervals/create`, reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post('time-intervals/create', reqData, { headers: reqData.getHeaders() });
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -130,7 +130,7 @@ class CattrIntervals {
     if (interval.mouseActivity)
       reqData.append('mouse_fill', interval.mouseActivity);
 
-    const res = await this.$.post(`time-intervals/create`, reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post('time-intervals/create', reqData, { headers: reqData.getHeaders() });
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -159,7 +159,7 @@ class CattrIntervals {
     if (typeof intervalId !== 'number')
       throw new TypeError(`Interval ID  must be a Number, but ${typeof intervalId} is given`);
 
-    const res = await this.$.post(`time-intervals/remove`, { id: intervalId });
+    const res = await this.$.post('time-intervals/remove', { id: intervalId });
     if (!res.success) {
 
       if (res.isNetworkError)

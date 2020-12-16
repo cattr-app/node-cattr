@@ -12,9 +12,12 @@ class Company {
 
   async heartbeatInterval() {
 
-    try {
-      const res = await this.$.get('/company-settings', {});
-    } catch (error) {
+    const res = await this.$.get('/company-settings', {});
+
+    if (!res.success) {
+
+      if (res.isNetworkError)
+        throw new this.$.NetworkError(res);
 
       throw new this.$.ApiError(
         res.error.response.status,
@@ -24,13 +27,14 @@ class Company {
 
     }
 
-    if (!res.success) {
-      if (res.isNetworkError)
-      throw new this.$.NetworkError(res);
+    // Safely obtain the heartbeat interval
+    if (res.response.data && res.response.data.data && res.response.data.data.heartbeat_period)
+      return res.response.data.data.heartbeat_period;
+
+    // Return null if response format is unexpected
+    return null;
 
   }
-    return res.response.data.data.heartbeat_period;
-}
 
   async heartBeat() {
 
@@ -48,7 +52,7 @@ class Company {
       );
 
     }
-    
+
     return res;
 
   }

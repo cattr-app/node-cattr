@@ -249,7 +249,6 @@ module.exports = $ => {
     }
 
     if (
-      //!req.response.data.success ||
       typeof req.response.data.access_token !== 'string' ||
       typeof req.response.data.token_type !== 'string' ||
       typeof req.response.data.expires_in !== 'string'
