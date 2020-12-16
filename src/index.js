@@ -10,6 +10,8 @@ const Screenshots = require('./resources/screenshots');
 const Intervals = require('./resources/intervals');
 const Company = require('./resources/company');
 
+const urlHandler = require('./url-handler');
+
 /**
  * Some entity (like token or credentials) provider interface
  * @typedef {Object} EntityProvider
@@ -135,19 +137,39 @@ class Cattr {
    * @param {String} url Entrypoint
    * @returns {String} Final entrypoint URL
    */
-  setBaseUrl(url) {
+  async setBaseUrl (url) {
 
-    if (typeof url !== 'string' || url.length === 0)
+    let stringUrl = url;
+
+    if (typeof stringUrl !== 'string' || stringUrl.length === 0)
       throw new TypeError('Incorrect base URL');
 
     // Use HTTPS protocol, if proto is not strictly defined
-    if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0)
-      url = `https://${url.trim()}/api`;
+    if (url.indexOf('http://') !== 0 && stringUrl.indexOf('https://') !== 0)
+      stringUrl = `https://${stringUrl.trim()}/api`;
 
-    this.axiosConfiguration.baseURL = url;
-    return url;
+    let checkedUrl = await urlHandler.checkUrl(stringUrl);
+    
+    if (!checkedUrl) {
+      stringUrl = `http://${stringUrl.trim()}/api`;
+
+      checkedUrl = await this.checkUrl(stringUrl);
+
+      if (checkedUrl) {
+
+        this.axiosConfiguration.baseURL = checkedUrl;
+        return checkedUrl;  
+      
+      }
+
+      return null;
+      
+    }
+
+    return checkedUrl;
 
   }
+
 
   /**
    * Attempt to fetch new token using saved credentials
@@ -194,7 +216,7 @@ class Cattr {
   }
 
   /**
-   * Checks is this a Cattr instance
+   * Checks if this is a Cattr instance
    * @async
    * @returns {Promise<Boolean>} True if Cattr detected
    */
