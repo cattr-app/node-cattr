@@ -263,6 +263,63 @@ module.exports = $ => {
 
   };
 
+  /**
+   * Obtains a redirection URL for a "app to web" single-click authentication
+   * @async
+   * @returns {Promise.<Error|String>} Redirection URL if succeed, error otherwise
+   */
+  ops.getSingleClickRedirection = async () => {
+
+    const req = await $.get('auth/desktop-key', {});
+    if (!req.success) {
+
+      if (req.isNetworkError)
+        throw new $.NetworkError(req);
+
+      if (req.error && req.error instanceof $.ApiError)
+        throw req.error;
+
+      throw new $.ApiError(
+        req.error.response.status,
+        req.error.response.data.error_type || 'unknown',
+        req.error.response.data.message || 'Unknown message',
+      );
+
+    }
+
+    // Extract token properties
+    const { access_token: token, token_type: type, frontend_uri: origin } = req.response.data;
+
+    // Verify token type
+    if (type !== 'desktop')
+      throw new Error(`Unexpected token type for a single-click auth: ${type}`);
+
+    // Detecting available protocol to access frontend part
+    let protocol = null;
+
+    // Try to fetch frontend manifest using HTTPS first
+    const manifestHttpsRequest = await $.get(`https://${origin}/cattr.manifest`);
+    if (manifestHttpsRequest.success && manifestHttpsRequest.response.data.frontend_version)
+      protocol = 'https';
+
+    // Trying HTTP if HTTPS request is not succeed
+    else {
+
+      const manifestHttpRequest = await $.get(`https://${origin}/cattr.manifest`);
+      if (manifestHttpRequest.success && manifestHttpRequest.response.data.frontend_version)
+        protocol = 'http';
+
+    }
+
+    // Return error, if both HTTP and HTTPS manifest requests was failed
+    if (protocol === null)
+      throw new Error(`One-click redirection URL supplied from server is not accessible: ${origin}`);
+
+    // Return redirection URL
+    return `${protocol}://${origin}/auth/desktop/login?token=${token}`;
+
+  };
+
   return ops;
 
 };
