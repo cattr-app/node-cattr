@@ -16,11 +16,11 @@
   "author": "Cattr Team & Contributors <hi@cattr.app>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "form-data": "^3.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
+    "eslint": "^7.16.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1"
   }
