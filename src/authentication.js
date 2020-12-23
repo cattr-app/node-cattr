@@ -294,29 +294,13 @@ module.exports = $ => {
     if (type !== 'desktop')
       throw new Error(`Unexpected token type for a single-click auth: ${type}`);
 
-    // Detecting available protocol to access frontend part
-    let protocol = null;
-
-    // Try to fetch frontend manifest using HTTPS first
-    const manifestHttpsRequest = await $.get(`https://${origin}/cattr.manifest`);
-    if (manifestHttpsRequest.success && manifestHttpsRequest.response.data.frontend_version)
-      protocol = 'https';
-
-    // Trying HTTP if HTTPS request is not succeed
-    else {
-
-      const manifestHttpRequest = await $.get(`https://${origin}/cattr.manifest`);
-      if (manifestHttpRequest.success && manifestHttpRequest.response.data.frontend_version)
-        protocol = 'http';
-
-    }
-
-    // Return error, if both HTTP and HTTPS manifest requests was failed
-    if (protocol === null)
-      throw new Error(`One-click redirection URL supplied from server is not accessible: ${origin}`);
+    // Allow only relatively secure (to be opened in shell) protocols (http, https)
+    const originParsed = new URL(origin);
+    if (![ 'http:', 'https:' ].includes(originParsed.protocol))
+      throw new Error(`Rejecting received SSO redirection URL due to restricted protocol: ${originParsed.protocol}`);
 
     // Return redirection URL
-    return `${protocol}://${origin}/auth/desktop/login?token=${token}`;
+    return `${origin}/auth/desktop/login?token=${token}`;
 
   };
 
