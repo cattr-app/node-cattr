@@ -1,6 +1,6 @@
 {
   "name": "@amazingcat/node-cattr",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "description": "Node.js client for Cattr API",
   "main": "index.js",
   "scripts": {
