@@ -133,19 +133,93 @@ class Cattr {
   /**
    * Sets base API URL
    * @param {String} url Entrypoint
-   * @returns {String} Final entrypoint URL
+   * @returns {Boolean} Is supplied URL successfully applied?
    */
-  setBaseUrl(url) {
+  async setBaseUrl(urlString) {
 
-    if (typeof url !== 'string' || url.length === 0)
-      throw new TypeError('Incorrect base URL');
+    // Perform execution safely
+    try {
 
-    // Use HTTPS protocol, if proto is not strictly defined
-    if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0)
-      url = `https://${url.trim()}/api`;
+      /**
+       * Verifies status url on a provded base URL
+       * @async
+       * @param {String} baseUrl Full base URL to be used
+       * @returns {Boolean} Is status endpoint verified or not
+       */
+      const checkStatusUrl = async baseUrl => {
 
-    this.axiosConfiguration.baseURL = url;
-    return url;
+        try {
+
+          const res = await axios.get(`${baseUrl}/status`);
+          return (typeof res.data === 'object' && res.data.cattr);
+
+        } catch (err) {
+
+          return false;
+
+        }
+
+      };
+
+      // Falling back protocol to HTTPS if it is not strictly defined
+      if (urlString.indexOf('://') === -1)
+        urlString = `https://${urlString}`;
+
+      // Parse URL
+      const url = new URL(urlString);
+
+      // Trying to get URL/status endpoint first
+      if (await checkStatusUrl(url.href)) {
+
+        this.axiosConfiguration.baseURL = url.href;
+        return true;
+
+      }
+
+      // Trying to read URL from the manifest file
+      try {
+
+        // Request a manifest file
+        const manifest = await axios.get(`${url.href}/cattr.manifest`);
+
+        // Ignore manifest unless it has a usable backend_path definition
+        if (typeof manifest.data === 'object' && manifest.data.backend_path) {
+
+          // Check supplied backend path
+          if (await checkStatusUrl(manifest.data.backend_path)) {
+
+            this.axiosConfiguration.baseURL = manifest.data.backend_path;
+            return true;
+
+          }
+
+        }
+
+      } catch (err) {
+
+        // Ignore manifest request, and move forward to /api
+
+      }
+
+
+      // Trying again with the /api suffix
+      if (await checkStatusUrl(`${url.href}/api`)) {
+
+        url.pathname += '/api';
+        this.axiosConfiguration.baseURL = url.href;
+        return true;
+
+      }
+
+      // Failed to autofix URL
+      return false;
+
+    } catch (err) {
+
+      // Just return false in case of error
+      return false;
+
+    }
 
   }
 
@@ -200,7 +274,7 @@ class Cattr {
    */
   async isCattrInstance() {
 
-    const res = await this.get('status', { noAuth: true });
+    const res = await this.get('/status', { noAuth: true });
     return res.success && (res.response.data.amazingtime || res.response.data.cattr);
 
   }
