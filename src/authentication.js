@@ -304,6 +304,49 @@ module.exports = $ => {
 
   };
 
+  /**
+   * Authenticates in backend by SSO token
+   * @async
+   * @param {String} token Desktop-token, issued by core application
+   * @returns {Promise.<UserLoginDTO>}
+   */
+  ops.authenticateViaSSO = async token => {
+
+    if (typeof token !== 'string' || token.length === 0)
+      throw new TypeError('Incorrect token parameter given');
+
+    const res = await $.put('auth/desktop-key', {}, {
+      noAuth: true,
+      headers: { Authorization: `desktop ${token}` }
+    });
+
+    if (!res.success) {
+
+      if (res.isNetworkError)
+        throw new $.NetworkError(res);
+
+      if (res.error && res.error instanceof $.ApiError)
+        throw res.error;
+
+      throw new $.ApiError(
+        res.error.response.status,
+        res.error.response.data.error_type || 'unknown',
+        res.error.response.data.message || 'Unknown message',
+      );
+
+    }
+
+    return {
+      token: {
+        token: res.response.data.access_token,
+        tokenType: res.response.data.token_type,
+        tokenExpire: new Date(res.response.data.expires_in),
+      },
+      user: userFormatter(res.response.data.user)
+    };
+
+  };
+
   return ops;
 
 };

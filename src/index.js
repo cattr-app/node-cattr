@@ -423,7 +423,10 @@ class Cattr {
     try {
 
       const res = await this.axios({
-        method: 'post', data: body, url, headers
+        url,
+        headers,
+        data: body,
+        method: (opts && opts.method) ? opts.method : 'post',
       });
 
       return {
@@ -471,100 +474,21 @@ class Cattr {
    */
   async patch(url, body, opts) {
 
-    if (typeof url !== 'string')
-      throw new TypeError(`URL parameter must be a string, but ${typeof url} given`);
-
-    if (typeof body !== 'object')
-      throw new TypeError(`Body must be an object (for JSON or FormData), but ${typeof body} given`);
-
-    const headers = {};
-
-    if (opts && typeof opts.headers === 'object')
-      Object.assign(headers, opts.headers);
-
-    if (opts && opts.isFormData === true)
-      headers['Content-type'] = 'multipart/form-data';
-
-    if (opts && opts.method && [ 'post', 'put', 'patch' ].indexOf(opts.method) === -1)
-      throw new TypeError(`Unsupported request method: ${opts.method}`);
-
-    if (!opts || !opts.noAuth) {
-
-      const token = await this.providers.token.get();
-
-      // Renewing token if it isn't available in provider
-      if (!token) {
-
-        if (opts && opts.noRelogin) {
-
-          return {
-            success: false,
-            isNetworkError: false,
-            error: new this.CredentialsError(401, 'authorization.unauthorized', 'Token provider returned nothing, but relogin is disabled')
-          };
-
-        }
-
-        if (!await this.reloginAutomatically()) {
-
-          return {
-            success: false,
-            isNetworkError: false,
-            error: new this.CredentialsError(401, 'authorization.unauthorized', 'Token provider returned nothing, and relogin is failed')
-          };
-
-        }
-
-      }
-
-      headers.Authorization = `Bearer ${(await this.providers.token.get()).token}`;
-
-    }
-
-    // Making request
-    try {
-
-      const res = await this.axios({
-        method: 'patch', data: body, url, headers
-      });
-
-      return {
-        success: true,
-        response: res
-      };
-
-    } catch (err) {
-
-      // Pass error if autentication disabled
-      if (opts && opts.noAuth)
-        return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
-
-      // Return networking error
-      if (!err.response)
-        return { success: false, isNetworkError: true, error: err };
-
-      // Pass error if it isn't related to the authentication token
-      if (
-        err.response.status !== 401 ||
-        (err.response.data.error_type !== 'authorization.unauthorized' && err.response.data.error_type !== 'authorization.token_expired')
-      )
-        return { success: false, isNetworkError: false, error: err };
-
-      // Pass error if automatical relogin is disabled
-      if (opts && opts.noRelogin)
-        return { success: false, isNetworkError: false, error: err };
-
-      // Try to relogin automatically, pass error if failed
-      if (!await this.reloginAutomatically())
-        return { success: false, isNetworkError: false, error: err };
-
-      // Say hi to recursion!
-      return this.patch(url, body, Object.assign(opts || {}, { noRelogin: true }));
-
-    }
+    return this.post(url, body, { method: 'patch', ...opts });
 
   }
 
+  /**
+   * Perform PUT request
+   * @param {String}         url  Endpoint location relative to baseURL
+   * @param {Object}         body Object / Formdata to be sent
+   * @param {RequestOptions} opts Additional options for this request
+   */
+  async put(url, body, opts) {
+
+    return this.post(url, body, { method: 'put', ...opts });
+
+  }
 
 }
 
