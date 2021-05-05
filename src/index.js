@@ -150,7 +150,7 @@ class Cattr {
 
         try {
 
-          const res = await axios.get(`${baseUrl}/status`);
+          const res = await axios.get(`${baseUrl}/status`, { timeout: 2000 });
           return (typeof res.data === 'object' && res.data.cattr);
 
         } catch (err) {
