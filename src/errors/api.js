@@ -15,7 +15,7 @@ class ApiError extends Error {
 
     super();
     this.type = type;
-    this.status = status;
+    this.statusCode = status;
     this.message = message;
     this.isApiError = true;
 
