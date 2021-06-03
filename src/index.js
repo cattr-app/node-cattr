@@ -133,9 +133,10 @@ class Cattr {
   /**
    * Sets base API URL
    * @param {String} url Entrypoint
+   * @param {Boolean} [force=false] Set URL forcefully without pinging the remote
    * @returns {Boolean} Is supplied URL successfully applied?
    */
-  async setBaseUrl(urlString) {
+  async setBaseUrl(urlString, force = false) {
 
     // Perform execution safely
     try {
@@ -169,7 +170,7 @@ class Cattr {
       const url = new URL(urlString);
 
       // Trying to get URL/status endpoint first
-      if (await checkStatusUrl(url.href)) {
+      if (force || await checkStatusUrl(url.href)) {
 
         this.axiosConfiguration.baseURL = url.href;
         return true;
@@ -338,6 +339,10 @@ class Cattr {
       // Pass error if autentication disabled
       if (opts && opts.noAuth)
         return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
+
+      // Catch network error
+      if (!err.response)
+        return { success: false, isNetworkError: true, error: err };
 
       // Pass error if it isn't related to the authentication token
       if (
