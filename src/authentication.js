@@ -80,6 +80,7 @@ module.exports = $ => {
       inactivityTimeout: Number(user.computer_time_popup),
       screenshotsEnabled: Boolean(user.screenshots_active),
       screenshotsInterval: Number(user.screenshots_interval),
+      appMonitoringEnabled: Boolean(user.web_and_app_monitoring),
       isActive: Boolean(user.active),
       isAdmin: Boolean(user.is_admin),
       isImportant: Boolean(user.important),
