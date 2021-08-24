@@ -27,6 +27,14 @@ const FormData = require('form-data');
  * @property {Date}   updatedAt Date of last update
  */
 
+/**
+ * Active window properties (used within the Web/App Monitoring)
+ * @typedef {Object} ActiveApplicationParams
+ * @property {String} [executable] Path to the executable file
+ * @property {String} [title] Window's title
+ * @property {String} [url] Browser window's URL
+ */
+
 class CattrIntervals {
 
   /**
@@ -174,6 +182,16 @@ class CattrIntervals {
     }
 
     return true;
+
+  }
+
+  /**
+   * Notify server about active window change
+   * @async
+   * @param {ActiveApplicationParams} application Properties of the active application
+   */
+  async pushActiveApplicationUpdate(application) {
+
 
   }
 
