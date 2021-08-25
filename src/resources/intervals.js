@@ -226,11 +226,11 @@ class CattrIntervals {
     }
 
     return {
-      id: res.response.data.id,
-      title: res.response.data.title,
-      executable: res.response.data.executable,
-      updatedAt: res.response.data.updated_at,
-      createdAt: res.response.data.created_at,
+      id: res.response.data.res.id,
+      title: res.response.data.res.title,
+      executable: res.response.data.res.executable,
+      updatedAt: res.response.data.res.updated_at,
+      createdAt: res.response.data.res.created_at,
     }
 
   }
