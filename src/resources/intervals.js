@@ -192,6 +192,28 @@ class CattrIntervals {
    */
   async pushActiveApplicationUpdate(application) {
 
+    if (typeof application !== 'object')
+      throw new ApiError(`Active Application DTO must be an object, but ${typeof application} is given`);
+
+    const reqData = new FormData();
+    reqData.append('title', application.title);
+    reqData.append('executable', application.executable);
+
+    
+    const res = await this.$.put('time-intervals/app', reqData, { headers: reqData.getHeaders() });
+
+    if (!res.success) {
+
+      if (res.isNetworkError)
+        throw new this.$.NetworkError(res);
+
+      throw new this.$.ApiError(
+        res.error.response.status,
+        res.error.response.data.error_type || 'unknown',
+        res.error.response.data.message || 'Unknown message',
+      );
+
+    }
 
   }
 
