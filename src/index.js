@@ -202,11 +202,10 @@ class Cattr {
 
       }
 
-
       // Trying again with the /api suffix
-      if (await checkStatusUrl(`${url.href}/api`)) {
+      if (await checkStatusUrl(`${url.href}api`)) {
 
-        url.pathname += '/api';
+        url.pathname += 'api';
         this.axiosConfiguration.baseURL = url.href;
         return true;
 
