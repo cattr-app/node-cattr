@@ -193,23 +193,21 @@ class CattrIntervals {
   async pushActiveApplicationUpdate(application) {
 
     if (typeof application !== 'object')
-      throw new ApiError(`Active Application DTO must be an object, but ${typeof application} is given`);
-      
+      throw new this.$.ApiError(`Active Application DTO must be an object, but ${typeof application} is given`);
+
     if (typeof application.title !== 'string')
-      throw new Error('Active window\'s title isn\'t string!')
+      throw new TypeError('Active window\'s title isn\'t string!');
     if (application.title === '')
-      throw new Error('Active window\'s title shouldn\'t be empty!')
+      throw new TypeError('Active window\'s title shouldn\'t be empty!');
 
     if (typeof application.executable !== 'string')
-      throw new Error('Active window\'s executable isn\'t string!')
+      throw new TypeError('Active window\'s executable isn\'t string!');
     if (application.executable === '')
-      throw new Error('Active window\'s executable shouldn\'t be empty!')
-      
+      throw new TypeError('Active window\'s executable shouldn\'t be empty!');
+
     const res = await this.$.put('time-intervals/app', application);
 
     if (!res.success) {
-
-      console.log(res.error.response.data);
 
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
@@ -228,7 +226,7 @@ class CattrIntervals {
       executable: res.response.data.res.executable,
       updatedAt: res.response.data.res.updated_at,
       createdAt: res.response.data.res.created_at,
-    }
+    };
 
   }
 
