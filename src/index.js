@@ -22,6 +22,7 @@ const Company = require('./resources/company');
  * @typedef {Object} RequestOptions
  * @property {Object}  [headers]    Additional headers
  * @property {Boolean} [noAuth]     Do not authenticate this request
+ * @property {Boolean} [noPaginate] Do not paginate this request
  * @property {Boolean} [isFormData] Send body as formdata
  */
 
@@ -152,7 +153,7 @@ class Cattr {
         try {
 
           const res = await axios.get(`${baseUrl}/status`, { timeout: 5000 });
-          return (typeof res.data === 'object' && res.data.cattr);
+          return (typeof res.data === 'object' && res.data.data.cattr);
 
         } catch (err) {
 
@@ -327,11 +328,14 @@ class Cattr {
 
     }
 
+    if (opts && opts.noPaginate === true)
+      headers['X-Paginate'] = 'false';
+
     // Making request
     try {
 
       const res = await this.axios({ method: 'get', url, headers });
-      return { success: true, response: res };
+      return { success: true, response: res.data };
 
     } catch (err) {
 
@@ -387,6 +391,9 @@ class Cattr {
     if (opts && opts.isFormData === true)
       headers['Content-type'] = 'multipart/form-data';
 
+    if (opts && opts.noPaginate === true)
+      headers['X-Paginate'] = 'false';
+
     if (opts && opts.method && [ 'post', 'put', 'patch' ].indexOf(opts.method) === -1)
       throw new TypeError(`Unsupported request method: ${opts.method}`);
 
@@ -435,7 +442,7 @@ class Cattr {
 
       return {
         success: true,
-        response: res
+        response: res.data,
       };
 
     } catch (err) {

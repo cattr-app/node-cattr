@@ -56,7 +56,7 @@ class CattrProjects {
     if (opts && typeof opts !== 'object')
       throw new TypeError(`Projects filtering options must be an Object, but ${typeof opts} given`);
 
-    const res = await this.$.post('projects/list', opts || {});
+    const res = await this.$.post('projects/list', opts || {}, { noPaginate: true });
     if (!res.success) {
 
       if (res.isNetworkError)

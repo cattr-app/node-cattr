@@ -190,7 +190,7 @@ module.exports = $ => {
     /* if (!res.response.data.success || typeof res.response.data.user !== 'object')
       throw new $.ApiError(0, 'unexpected_structure', 'Incorrect response structure');  */
 
-    return userFormatter(res.response.data.user);
+    return userFormatter(res.response.data);
 
   };
 

@@ -106,8 +106,6 @@ class CattrIntervals {
 
     }
 
-    return CattrIntervals.represent(res.response.data.interval);
-
   }
 
   /**
@@ -139,6 +137,7 @@ class CattrIntervals {
       reqData.append('mouse_fill', interval.mouseActivity);
 
     const res = await this.$.post('time-intervals/create', reqData, { headers: reqData.getHeaders() });
+
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -151,8 +150,6 @@ class CattrIntervals {
       );
 
     }
-
-    return CattrIntervals.represent(res.response.data.interval);
 
   }
 
@@ -219,14 +216,6 @@ class CattrIntervals {
       );
 
     }
-
-    return {
-      id: res.response.data.res.id,
-      title: res.response.data.res.title,
-      executable: res.response.data.res.executable,
-      updatedAt: res.response.data.res.updated_at,
-      createdAt: res.response.data.res.created_at,
-    };
 
   }
 
