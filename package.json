@@ -1,27 +1,36 @@
 {
-  "name": "@amazingcat/node-cattr",
-  "version": "4.0.0-RC1",
+  "name": "@cattr/node",
+  "version": "4.0.0-RC2",
   "description": "Node.js client for Cattr API",
   "main": "index.js",
   "scripts": {
     "lint": "eslint ."
   },
+  "bugs": "https://git.amazingcat.net/cattr/desktop/node-modules/node-cattr/-/issues",
   "repository": {
     "type": "git",
-    "url": "git@github.com:cattr-app/node-cattr.git"
+    "url": "https://git.amazingcat.net/cattr/desktop/node-modules/node-cattr.git"
   },
   "keywords": [
     "cattr"
   ],
   "author": "Cattr Team & Contributors <hi@cattr.app>",
+  "contributors": [
+    "Alex V <alex@cattr.app>"
+  ],
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.22.0",
+    "axios": "^0.27.2",
     "form-data": "^4.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-plugin-import": "^2.24.2"
+    "eslint": "^8.16.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.26.0"
+  },
+  "dependenciesMeta": {
+    "eslint": {
+      "unplugged": true
+    }
   }
 }
