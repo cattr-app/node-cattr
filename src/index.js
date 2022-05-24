@@ -152,7 +152,7 @@ class Cattr {
 
         try {
 
-          const res = await axios.get(`${baseUrl}/status`, { timeout: 5000 });
+          const res = await axios.get(`${baseUrl}status`, { timeout: 5000 });
           return (typeof res.data === 'object' && res.data.data.cattr);
 
         } catch (err) {
@@ -182,7 +182,7 @@ class Cattr {
       try {
 
         // Request a manifest file
-        const manifest = await axios.get(`${url.href}/cattr.manifest`);
+        const manifest = await axios.get(`${url.href}cattr.manifest`);
 
         // Ignore manifest unless it has a usable backend_path definition
         if (typeof manifest.data === 'object' && manifest.data.backend_path) {
@@ -393,6 +393,8 @@ class Cattr {
 
     if (opts && opts.noPaginate === true)
       headers['X-Paginate'] = 'false';
+
+    headers['X-Requested-With'] = `Cattr-Node/v${process.env.npm_package_version}`;
 
     if (opts && opts.method && [ 'post', 'put', 'patch' ].indexOf(opts.method) === -1)
       throw new TypeError(`Unsupported request method: ${opts.method}`);
