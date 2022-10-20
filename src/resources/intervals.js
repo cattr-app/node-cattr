@@ -106,6 +106,8 @@ class CattrIntervals {
 
     }
 
+    return res.response.data;
+
   }
 
   /**
@@ -150,6 +152,8 @@ class CattrIntervals {
       );
 
     }
+
+    return res.response.data;
 
   }
 
