@@ -106,7 +106,7 @@ class CattrIntervals {
 
     }
 
-    return res.response.data;
+    return res;
 
   }
 
@@ -153,7 +153,7 @@ class CattrIntervals {
 
     }
 
-    return res.response.data;
+    return res;
 
   }
 
@@ -176,8 +176,8 @@ class CattrIntervals {
 
       throw new this.$.ApiError(
         res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
+        res.error.response.data.error.code || 'unknown',
+        res.error.response.data.error.message || 'Unknown message',
       );
 
     }
