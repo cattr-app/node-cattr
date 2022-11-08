@@ -198,8 +198,6 @@ class CattrIntervals {
 
     if (typeof application.title !== 'string')
       throw new TypeError('Active window\'s title isn\'t string!');
-    if (application.title === '')
-      throw new TypeError('Active window\'s title shouldn\'t be empty!');
 
     if (typeof application.executable !== 'string')
       throw new TypeError('Active window\'s executable isn\'t string!');
