@@ -7,26 +7,6 @@
  */
 
 /**
- * Role entity
- * @typedef  {Object} RoleEntity
- * @property {Number}    id        ID
- * @property {String}    name      Role name
- * @property {Date}      createdAt Date of creation
- * @property {Date}      updatedAt Last update timestamp
- * @property {Date|null} deletedAt Date of removal
- */
-
-/**
- * Data object representing project-specific role
- * @typedef  {Object} ProjectRole
- * @property {Number}     projectId ID
- * @property {RoleEntity} role      Assigned role entity
- * @property {Date}       createdAt Date of creation
- * @property {Date}       updatedAt Last update timestamp
- * @property {Date|null}  deletedAt Date of removal
- */
-
-/**
  * User entity
  * @typedef  {Object} UserEntity
  * @property {Number} id ID
@@ -89,28 +69,7 @@ module.exports = $ => {
       createdAt: new Date(user.created_at),
       updatedAt: new Date(user.updated_at),
       deletedAt: user.deleted_at ? new Date(user.deleted_at) : null,
-      role: {
-        id: Number(user.role.id),
-        name: String(user.role.name),
-        createdAt: new Date(user.role.created_at),
-        updatedAt: new Date(user.role.updated_at),
-        deletedAt: user.role.deleted_at ? new Date(user.role.deleted_at) : null,
-      }
     };
-
-    formattedOut.projectsRole = user.projects_relation.map(pr => ({
-      projectId: String(pr.project_id),
-      createdAt: new Date(pr.created_at),
-      updatedAt: new Date(pr.updated_at),
-      deletedAt: pr.deleted_at ? new Date(pr.deleted_at) : null,
-      role: {
-        id: Number(pr.role.id),
-        name: String(pr.role.name),
-        createdAt: new Date(pr.role.created_at),
-        updatedAt: new Date(pr.role.updated_at),
-        deletedAt: pr.role.deleted_at ? new Date(pr.role.deleted_at) : null,
-      }
-    }));
 
     return formattedOut;
 
