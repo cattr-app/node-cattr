@@ -1,5 +1,3 @@
-const FormData = require('form-data');
-
 /**
  * Screenshot data object
  * @typedef  {Object} ScreenshotEntry
@@ -55,21 +53,17 @@ class CattrScreenshots {
     if (!Buffer.isBuffer(screenshot))
       throw new TypeError(`Screenshot must be a Buffer, but ${typeof screenshot} is given`);
 
-    const reqData = new FormData();
-    reqData.append('time_interval_id', intervalId);
-    reqData.append('screenshot', screenshot, { filename: 'screenshot.jpeg' });
+    const reqData = {};
+    reqData.time_interval_id = intervalId;
+    reqData.screenshot = [ screenshot, { filename: 'screenshot.jpeg' } ];
 
-    const res = await this.$.post('screenshots/create', reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post('screenshots/create', reqData, { isFormData: true });
     if (!res.success) {
 
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 

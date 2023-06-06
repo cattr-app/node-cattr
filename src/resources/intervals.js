@@ -1,5 +1,3 @@
-const FormData = require('form-data');
-
 /**
  * DTO representing interval which should be pushed
  * @typedef  {Object} IntervalPushDTO
@@ -79,30 +77,26 @@ class CattrIntervals {
     if (typeof interval !== 'object')
       throw new TypeError(`Interval DTO must be an object, but ${typeof intervalId} is given`);
 
-    const reqData = new FormData();
-    reqData.append('task_id', interval.taskId);
-    reqData.append('user_id', interval.userId);
-    reqData.append('start_at', interval.start.toISOString());
-    reqData.append('end_at', interval.end.toISOString());
-    reqData.append('activity_fill', interval.systemActivity);
+    const reqData = {};
+    reqData.task_id = interval.taskId;
+    reqData.user_id = interval.userId;
+    reqData.start_at = interval.start.toISOString();
+    reqData.end_at = interval.end.toISOString();
+    reqData.activity_fill = interval.systemActivity;
 
     if (interval.keyboardActivity)
-      reqData.append('keyboard_fill', interval.keyboardActivity);
+      reqData.keyboard_fill = interval.keyboardActivity;
 
     if (interval.mouseActivity)
-      reqData.append('mouse_fill', interval.mouseActivity);
+      reqData.mouse_fill = interval.mouseActivity;
 
-    const res = await this.$.post('time-intervals/create', reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post('time-intervals/create', reqData, { isFormData: true });
     if (!res.success) {
 
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 
@@ -124,32 +118,28 @@ class CattrIntervals {
     if (!Buffer.isBuffer(screenshot))
       throw new TypeError(`Screenshot must be a Buffer, but ${typeof screenshot} is given`);
 
-    const reqData = new FormData();
-    reqData.append('task_id', interval.taskId);
-    reqData.append('user_id', interval.userId);
-    reqData.append('start_at', interval.start.toISOString());
-    reqData.append('end_at', interval.end.toISOString());
-    reqData.append('activity_fill', interval.systemActivity);
-    reqData.append('screenshot', screenshot, { filename: 'screenshot.jpeg' });
+    const reqData = {};
+    reqData.task_id = interval.taskId;
+    reqData.user_id = interval.userId;
+    reqData.start_at = interval.start.toISOString();
+    reqData.end_at = interval.end.toISOString();
+    reqData.activity_fill = interval.systemActivity;
+    reqData.screenshot = [ screenshot, { filename: 'screenshot.jpeg' } ];
 
     if (interval.keyboardActivity)
-      reqData.append('keyboard_fill', interval.keyboardActivity);
+      reqData.keyboard_fill = interval.keyboardActivity;
 
     if (interval.mouseActivity)
-      reqData.append('mouse_fill', interval.mouseActivity);
+      reqData.mouse_fill = interval.mouseActivity;
 
-    const res = await this.$.post('time-intervals/create', reqData, { headers: reqData.getHeaders() });
+    const res = await this.$.post('time-intervals/create', reqData, { isFormData: true });
 
     if (!res.success) {
 
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 
@@ -174,11 +164,7 @@ class CattrIntervals {
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error.code || 'unknown',
-        res.error.response.data.error.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 
@@ -194,7 +180,7 @@ class CattrIntervals {
   async pushActiveApplicationUpdate(application) {
 
     if (typeof application !== 'object')
-      throw new this.$.ApiError(`Active Application DTO must be an object, but ${typeof application} is given`);
+      throw new TypeError(`Active Application DTO must be an object, but ${typeof application} is given`);
 
     if (typeof application.title !== 'string')
       throw new TypeError('Active window\'s title isn\'t string!');
@@ -211,11 +197,7 @@ class CattrIntervals {
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 

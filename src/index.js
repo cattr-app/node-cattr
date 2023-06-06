@@ -339,28 +339,57 @@ class Cattr {
 
     } catch (err) {
 
-      // Pass error if autentication disabled
-      if (opts && opts.noAuth)
-        return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
+      const context = {
+        url,
+        method: 'get'
+      };
+      // Pass error if authentication disabled
+      if (opts && opts.noAuth) {
+
+        return {
+          success: false, isNetworkError: !err.response, error: err, context
+        };
+
+      }
 
       // Catch network error
-      if (!err.response)
-        return { success: false, isNetworkError: true, error: err };
+      if (!err.response) {
+
+        return {
+          success: false, isNetworkError: true, error: err, context
+        };
+
+      }
 
       // Pass error if it isn't related to the authentication token
       if (
         err.response.status !== 401 ||
-        (err.response.data.error_type !== 'authorization.unauthorized' && err.response.data.error_type !== 'authorization.token_expired')
-      )
-        return { success: false, isNetworkError: false, error: err };
+        (err.response.data.code !== 'authorization.unauthorized' && err.response.data.code !== 'authorization.token_expired')
+      ) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Pass error if automatical relogin is disabled
-      if (opts && opts.noRelogin)
-        return { success: false, isNetworkError: false, error: err };
+      if (opts && opts.noRelogin) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Try to relogin automatically, pass error if failed
-      if (!await this.reloginAutomatically())
-        return { success: false, isNetworkError: false, error: err };
+      if (!await this.reloginAutomatically()) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Say hi to recursion!
       return this.get(url, Object.assign(opts || {}, { noRelogin: true }));
@@ -389,7 +418,7 @@ class Cattr {
       Object.assign(headers, opts.headers);
 
     if (opts && opts.isFormData === true)
-      headers['Content-type'] = 'multipart/form-data';
+      headers['content-type'] = 'multipart/form-data';
 
     if (opts && opts.noPaginate === true)
       headers['X-Paginate'] = 'false';
@@ -432,6 +461,7 @@ class Cattr {
 
     }
 
+    const method = (opts && opts.method) ? opts.method : 'post';
     // Making request
     try {
 
@@ -439,7 +469,7 @@ class Cattr {
         url,
         headers,
         data: body,
-        method: (opts && opts.method) ? opts.method : 'post',
+        method,
       });
 
       return {
@@ -449,28 +479,62 @@ class Cattr {
 
     } catch (err) {
 
-      // Pass error if autentication disabled
-      if (opts && opts.noAuth)
-        return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
+      const context = {
+        url,
+        payload: Object.fromEntries(Object.entries(body)
+          .map(([ key, val ]) => (
+            [ 'screenshot', 'password', 'secret', 'token', 'api_key' ]
+              .some(str => key.includes(str)) ? [ key, '***' ] : [ key, val ]
+          ))),
+        method
+      };
+      // Pass error if authentication disabled
+      if (opts && opts.noAuth) {
+
+        return {
+          success: false, isNetworkError: !err.response, error: err, context
+        };
+
+      }
 
       // Return networking error
-      if (!err.response)
-        return { success: false, isNetworkError: true, error: err };
+      if (!err.response) {
+
+        return {
+          success: false, isNetworkError: true, error: err, context
+        };
+
+      }
 
       // Pass error if it isn't related to the authentication token
       if (
         err.response.status !== 401 ||
-        (err.response.data.error_type !== 'authorization.unauthorized' && err.response.data.error_type !== 'authorization.token_expired')
-      )
-        return { success: false, isNetworkError: false, error: err };
+        (err.response.data.code !== 'authorization.unauthorized' && err.response.data.code !== 'authorization.token_expired')
+      ) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Pass error if automatical relogin is disabled
-      if (opts && opts.noRelogin)
-        return { success: false, isNetworkError: false, error: err };
+      if (opts && opts.noRelogin) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Try to relogin automatically, pass error if failed
-      if (!await this.reloginAutomatically())
-        return { success: false, isNetworkError: false, error: err };
+      if (!await this.reloginAutomatically()) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Say hi to recursion!
       return this.post(url, body, Object.assign(opts || {}, { noRelogin: true }));
