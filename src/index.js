@@ -23,7 +23,7 @@ const Company = require('./resources/company');
  * @property {Object}  [headers]    Additional headers
  * @property {Boolean} [noAuth]     Do not authenticate this request
  * @property {Boolean} [noPaginate] Do not paginate this request
- * @property {Boolean} [isFormData] Send body as formdata
+ * @property {Boolean} [asFormData] Send body as formdata
  */
 
 /**
@@ -419,7 +419,7 @@ class Cattr {
     if (opts && typeof opts.headers === 'object')
       Object.assign(headers, opts.headers);
 
-    if (opts && opts.isFormData === true) {
+    if (opts && opts.asFormData === true) {
 
       // eslint-disable-next-line global-require
       const FormData = require('form-data');

@@ -57,7 +57,7 @@ class CattrScreenshots {
     reqData.time_interval_id = intervalId;
     reqData.screenshot = [ screenshot, { filename: 'screenshot.jpeg' } ];
 
-    const res = await this.$.post('screenshots/create', reqData, { isFormData: true });
+    const res = await this.$.post('screenshots/create', reqData, { asFormData: true });
     if (!res.success) {
 
       if (res.isNetworkError)

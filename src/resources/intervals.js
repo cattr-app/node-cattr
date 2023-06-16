@@ -90,7 +90,7 @@ class CattrIntervals {
     if (interval.mouseActivity)
       reqData.mouse_fill = interval.mouseActivity;
 
-    const res = await this.$.post('time-intervals/create', reqData, { isFormData: true });
+    const res = await this.$.post('time-intervals/create', reqData, { asFormData: true });
     if (!res.success) {
 
       if (res.isNetworkError)
@@ -132,7 +132,7 @@ class CattrIntervals {
     if (interval.mouseActivity)
       reqData.mouse_fill = interval.mouseActivity;
 
-    const res = await this.$.post('time-intervals/create', reqData, { isFormData: true });
+    const res = await this.$.post('time-intervals/create', reqData, { asFormData: true });
 
     if (!res.success) {
 
