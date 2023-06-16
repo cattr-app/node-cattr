@@ -401,7 +401,7 @@ class Cattr {
   /**
    * Perform POST request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async post(url, body, opts) {
@@ -412,13 +412,30 @@ class Cattr {
     if (typeof body !== 'object')
       throw new TypeError(`Body must be an object (for JSON or FormData), but ${typeof body} given`);
 
+    let requestData = body;
+
     const headers = {};
 
     if (opts && typeof opts.headers === 'object')
       Object.assign(headers, opts.headers);
 
-    if (opts && opts.isFormData === true)
-      headers['content-type'] = 'multipart/form-data';
+    if (opts && opts.isFormData === true) {
+
+      // eslint-disable-next-line global-require
+      const FormData = require('form-data');
+      requestData = new FormData();
+      Object.entries(body).forEach(([ key, value ]) => {
+
+        if (Array.isArray(value))
+          requestData.append(key, ...value);
+        else
+          requestData.append(key, value);
+
+      });
+
+      Object.assign(headers, requestData.getHeaders());
+
+    }
 
     if (opts && opts.noPaginate === true)
       headers['X-Paginate'] = 'false';
@@ -468,7 +485,7 @@ class Cattr {
       const res = await this.axios({
         url,
         headers,
-        data: body,
+        data: requestData,
         method,
       });
 
@@ -546,7 +563,7 @@ class Cattr {
   /**
    * Perform PATCH request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async patch(url, body, opts) {
@@ -558,7 +575,7 @@ class Cattr {
   /**
    * Perform PUT request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async put(url, body, opts) {
