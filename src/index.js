@@ -133,94 +133,69 @@ class Cattr {
 
   /**
    * Sets base API URL
-   * @param {String} url Entrypoint
+   * @param {String} urlString Entrypoint
    * @param {Boolean} [force=false] Set URL forcefully without pinging the remote
    * @returns {Boolean} Is supplied URL successfully applied?
    */
   async setBaseUrl(urlString, force = false) {
 
-    // Perform execution safely
-    try {
+    // Falling back protocol to HTTPS if it is not strictly defined
+    if (urlString.indexOf('://') === -1)
+      urlString = `https://${urlString}`;
 
-      /**
-       * Verifies status url on a provded base URL
-       * @async
-       * @param {String} baseUrl Full base URL to be used
-       * @returns {Boolean} Is status endpoint verified or not
-       */
-      const checkStatusUrl = async baseUrl => {
+    // Parse URL
+    const url = new URL(urlString);
 
-        try {
+    /**
+     * Verifies status url on a provided base URL
+     * @async
+     * @param {String} baseUrl Full base URL to be used
+     * @param {Boolean} throwError Should we just return result without throwing an error
+     * @returns {Object} Is status endpoint verified or not
+     */
+    const checkStatusUrl = async (baseUrl, throwError = true) => {
 
-          const res = await axios.get(`${baseUrl}status`, { timeout: 5000 });
-          return (typeof res.data === 'object' && res.data.data.cattr);
+      this.axiosConfiguration.baseURL = '';
+      const res = await this.get(`${baseUrl}status`, { timeout: 5000, noAuth: true });
 
-        } catch (err) {
+      if (!res.success && throwError) {
 
-          return false;
+        if (res.isNetworkError)
+          throw new this.NetworkError(res);
 
-        }
-
-      };
-
-      // Falling back protocol to HTTPS if it is not strictly defined
-      if (urlString.indexOf('://') === -1)
-        urlString = `https://${urlString}`;
-
-      // Parse URL
-      const url = new URL(urlString);
-
-      // Trying to get URL/status endpoint first
-      if (force || await checkStatusUrl(url.href)) {
-
-        this.axiosConfiguration.baseURL = url.href;
-        return true;
+        throw new this.ApiError(res);
 
       }
 
-      // Trying to read URL from the manifest file
-      try {
+      return res;
 
-        // Request a manifest file
-        const manifest = await axios.get(`${url.href}cattr.manifest`);
+    };
 
-        // Ignore manifest unless it has a usable backend_path definition
-        if (typeof manifest.data === 'object' && manifest.data.backend_path) {
+    const cattrExistsOnHostname = res => (typeof res.response?.data === 'object' && res.response.data.cattr);
 
-          // Check supplied backend path
-          if (await checkStatusUrl(manifest.data.backend_path)) {
+    // Trying to get URL/status endpoint first
+    let res = await checkStatusUrl(url.href, false);
 
-            this.axiosConfiguration.baseURL = manifest.data.backend_path;
-            return true;
+    if (force || cattrExistsOnHostname(res)) {
 
-          }
-
-        }
-
-      } catch (err) {
-
-        // Ignore manifest request, and move forward to /api
-
-      }
-
-      // Trying again with the /api suffix
-      if (await checkStatusUrl(`${url.href}api/`)) {
-
-        url.pathname += 'api';
-        this.axiosConfiguration.baseURL = url.href;
-        return true;
-
-      }
-
-      // Failed to autofix URL
-      return false;
-
-    } catch (err) {
-
-      // Just return false in case of error
-      return false;
+      this.axiosConfiguration.baseURL = url.href;
+      return { success: true };
 
     }
+
+    // Trying again with the /api suffix
+    res = await checkStatusUrl(`${url.href}api/`);
+
+    if (cattrExistsOnHostname(res)) {
+
+      url.pathname += 'api';
+      this.axiosConfiguration.baseURL = url.href;
+      return { success: true };
+
+    }
+
+    // Failed to autofix URL
+    throw new this.ApiError({ statusCode: 404, message: 'Cattr is not found on this hostname', context: res.context });
 
   }
 
