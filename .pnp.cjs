@@ -217,7 +217,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/axios-npm-0.28.0-3c9815353b-d378237751.zip/node_modules/axios/",\
           "packageDependencies": [\
             ["axios", "npm:0.28.0"],\
-            ["follow-redirects", "virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.5"],\
+            ["follow-redirects", "virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.6"],\
             ["form-data", "npm:4.0.0"],\
             ["proxy-from-env", "npm:1.1.0"]\
           ],\
@@ -878,17 +878,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["follow-redirects", [\
-        ["npm:1.15.5", {\
-          "packageLocation": "./.yarn/cache/follow-redirects-npm-1.15.5-9d14db76ca-5ca49b5ce6.zip/node_modules/follow-redirects/",\
+        ["npm:1.15.6", {\
+          "packageLocation": "./.yarn/cache/follow-redirects-npm-1.15.6-50635fe51d-a62c378dfc.zip/node_modules/follow-redirects/",\
           "packageDependencies": [\
-            ["follow-redirects", "npm:1.15.5"]\
+            ["follow-redirects", "npm:1.15.6"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.5", {\
-          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-65535ef4c7/0/cache/follow-redirects-npm-1.15.5-9d14db76ca-5ca49b5ce6.zip/node_modules/follow-redirects/",\
+        ["virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.6", {\
+          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-75ea1ee3ad/0/cache/follow-redirects-npm-1.15.6-50635fe51d-a62c378dfc.zip/node_modules/follow-redirects/",\
           "packageDependencies": [\
-            ["follow-redirects", "virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.5"],\
+            ["follow-redirects", "virtual:3c9815353b1b5f50f6a022959f137187c45bfc24d20e3586ad08022b07e24c42553785e511e110f3510c24ffdff4f09cd751c840e6c034ce5bbbea601f7b7321#npm:1.15.6"],\
             ["@types/debug", null],\
             ["debug", null]\
           ],\
