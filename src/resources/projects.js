@@ -39,8 +39,8 @@ class CattrProjects {
       source: String(raw.source),
       createdAt: new Date(raw.created_at),
       updatedAt: new Date(raw.updated_at),
-      deletedAt: raw.deleted_at ? new Date(raw.deleted_at) : null
-
+      deletedAt: raw.deleted_at ? new Date(raw.deleted_at) : null,
+      screenshotsState: Number(raw.screenshots_state)
     };
 
   }
