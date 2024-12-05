@@ -9,6 +9,7 @@ const Time = require('./resources/time');
 const Screenshots = require('./resources/screenshots');
 const Intervals = require('./resources/intervals');
 const Company = require('./resources/company');
+const OfflineSync = require('./resources/offline-sync');
 
 /**
  * Some entity (like token or credentials) provider interface
@@ -92,6 +93,7 @@ class Cattr {
     this.screenshots = new Screenshots(this);
     this.intervals = new Intervals(this);
     this.company = new Company(this);
+    this.offlineSync = new OfflineSync(this);
 
   }
 
