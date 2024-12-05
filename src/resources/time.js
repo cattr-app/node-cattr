@@ -66,11 +66,7 @@ class CattrTime {
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 
@@ -99,11 +95,7 @@ class CattrTime {
       if (res.isNetworkError)
         throw new this.$.NetworkError(res);
 
-      throw new this.$.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new this.$.ApiError(res);
 
     }
 

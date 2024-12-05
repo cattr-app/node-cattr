@@ -23,7 +23,7 @@ const Company = require('./resources/company');
  * @property {Object}  [headers]    Additional headers
  * @property {Boolean} [noAuth]     Do not authenticate this request
  * @property {Boolean} [noPaginate] Do not paginate this request
- * @property {Boolean} [isFormData] Send body as formdata
+ * @property {Boolean} [asFormData] Send body as formdata
  */
 
 /**
@@ -133,94 +133,69 @@ class Cattr {
 
   /**
    * Sets base API URL
-   * @param {String} url Entrypoint
+   * @param {String} urlString Entrypoint
    * @param {Boolean} [force=false] Set URL forcefully without pinging the remote
    * @returns {Boolean} Is supplied URL successfully applied?
    */
   async setBaseUrl(urlString, force = false) {
 
-    // Perform execution safely
-    try {
+    // Falling back protocol to HTTPS if it is not strictly defined
+    if (urlString.indexOf('://') === -1)
+      urlString = `https://${urlString}`;
 
-      /**
-       * Verifies status url on a provded base URL
-       * @async
-       * @param {String} baseUrl Full base URL to be used
-       * @returns {Boolean} Is status endpoint verified or not
-       */
-      const checkStatusUrl = async baseUrl => {
+    // Parse URL
+    const url = new URL(urlString);
 
-        try {
+    /**
+     * Verifies status url on a provided base URL
+     * @async
+     * @param {String} baseUrl Full base URL to be used
+     * @param {Boolean} throwError Should we just return result without throwing an error
+     * @returns {Object} Is status endpoint verified or not
+     */
+    const checkStatusUrl = async (baseUrl, throwError = true) => {
 
-          const res = await axios.get(`${baseUrl}status`, { timeout: 5000 });
-          return (typeof res.data === 'object' && res.data.data.cattr);
+      this.axiosConfiguration.baseURL = '';
+      const res = await this.get(`${baseUrl}status`, { timeout: 5000, noAuth: true });
 
-        } catch (err) {
+      if (!res.success && throwError) {
 
-          return false;
+        if (res.isNetworkError)
+          throw new this.NetworkError(res);
 
-        }
-
-      };
-
-      // Falling back protocol to HTTPS if it is not strictly defined
-      if (urlString.indexOf('://') === -1)
-        urlString = `https://${urlString}`;
-
-      // Parse URL
-      const url = new URL(urlString);
-
-      // Trying to get URL/status endpoint first
-      if (force || await checkStatusUrl(url.href)) {
-
-        this.axiosConfiguration.baseURL = url.href;
-        return true;
+        throw new this.ApiError(res);
 
       }
 
-      // Trying to read URL from the manifest file
-      try {
+      return res;
 
-        // Request a manifest file
-        const manifest = await axios.get(`${url.href}cattr.manifest`);
+    };
 
-        // Ignore manifest unless it has a usable backend_path definition
-        if (typeof manifest.data === 'object' && manifest.data.backend_path) {
+    const cattrExistsOnHostname = res => (typeof res.response?.data === 'object' && res.response.data.cattr);
 
-          // Check supplied backend path
-          if (await checkStatusUrl(manifest.data.backend_path)) {
+    // Trying to get URL/status endpoint first
+    let res = await checkStatusUrl(url.href, false);
 
-            this.axiosConfiguration.baseURL = manifest.data.backend_path;
-            return true;
+    if (force || cattrExistsOnHostname(res)) {
 
-          }
-
-        }
-
-      } catch (err) {
-
-        // Ignore manifest request, and move forward to /api
-
-      }
-
-      // Trying again with the /api suffix
-      if (await checkStatusUrl(`${url.href}api/`)) {
-
-        url.pathname += 'api';
-        this.axiosConfiguration.baseURL = url.href;
-        return true;
-
-      }
-
-      // Failed to autofix URL
-      return false;
-
-    } catch (err) {
-
-      // Just return false in case of error
-      return false;
+      this.axiosConfiguration.baseURL = url.href;
+      return { success: true };
 
     }
+
+    // Trying again with the /api suffix
+    res = await checkStatusUrl(`${url.href}api/`);
+
+    if (cattrExistsOnHostname(res)) {
+
+      url.pathname += 'api';
+      this.axiosConfiguration.baseURL = url.href;
+      return { success: true };
+
+    }
+
+    // Failed to autofix URL
+    throw new this.ApiError({ statusCode: 404, message: 'Cattr is not found on this hostname', context: res.context });
 
   }
 
@@ -339,28 +314,57 @@ class Cattr {
 
     } catch (err) {
 
-      // Pass error if autentication disabled
-      if (opts && opts.noAuth)
-        return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
+      const context = {
+        url,
+        method: 'get'
+      };
+      // Pass error if authentication disabled
+      if (opts && opts.noAuth) {
+
+        return {
+          success: false, isNetworkError: !err.response, error: err, context
+        };
+
+      }
 
       // Catch network error
-      if (!err.response)
-        return { success: false, isNetworkError: true, error: err };
+      if (!err.response) {
+
+        return {
+          success: false, isNetworkError: true, error: err, context
+        };
+
+      }
 
       // Pass error if it isn't related to the authentication token
       if (
         err.response.status !== 401 ||
-        (err.response.data.error_type !== 'authorization.unauthorized' && err.response.data.error_type !== 'authorization.token_expired')
-      )
-        return { success: false, isNetworkError: false, error: err };
+        (err.response.data.code !== 'authorization.unauthorized' && err.response.data.code !== 'authorization.token_expired')
+      ) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Pass error if automatical relogin is disabled
-      if (opts && opts.noRelogin)
-        return { success: false, isNetworkError: false, error: err };
+      if (opts && opts.noRelogin) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Try to relogin automatically, pass error if failed
-      if (!await this.reloginAutomatically())
-        return { success: false, isNetworkError: false, error: err };
+      if (!await this.reloginAutomatically()) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Say hi to recursion!
       return this.get(url, Object.assign(opts || {}, { noRelogin: true }));
@@ -372,7 +376,7 @@ class Cattr {
   /**
    * Perform POST request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async post(url, body, opts) {
@@ -383,13 +387,30 @@ class Cattr {
     if (typeof body !== 'object')
       throw new TypeError(`Body must be an object (for JSON or FormData), but ${typeof body} given`);
 
+    let requestData = body;
+
     const headers = {};
 
     if (opts && typeof opts.headers === 'object')
       Object.assign(headers, opts.headers);
 
-    if (opts && opts.isFormData === true)
-      headers['Content-type'] = 'multipart/form-data';
+    if (opts && opts.asFormData === true) {
+
+      // eslint-disable-next-line global-require
+      const FormData = require('form-data');
+      requestData = new FormData();
+      Object.entries(body).forEach(([ key, value ]) => {
+
+        if (Array.isArray(value))
+          requestData.append(key, ...value);
+        else
+          requestData.append(key, value);
+
+      });
+
+      Object.assign(headers, requestData.getHeaders());
+
+    }
 
     if (opts && opts.noPaginate === true)
       headers['X-Paginate'] = 'false';
@@ -432,14 +453,15 @@ class Cattr {
 
     }
 
+    const method = (opts && opts.method) ? opts.method : 'post';
     // Making request
     try {
 
       const res = await this.axios({
         url,
         headers,
-        data: body,
-        method: (opts && opts.method) ? opts.method : 'post',
+        data: requestData,
+        method,
       });
 
       return {
@@ -449,28 +471,62 @@ class Cattr {
 
     } catch (err) {
 
-      // Pass error if autentication disabled
-      if (opts && opts.noAuth)
-        return { success: false, isNetworkError: err.response ? !Number.isNaN(err.response.status) : true, error: err };
+      const context = {
+        url,
+        payload: Object.fromEntries(Object.entries(body)
+          .map(([ key, val ]) => (
+            [ 'screenshot', 'password', 'secret', 'token', 'api_key' ]
+              .some(str => key.includes(str)) ? [ key, '***' ] : [ key, val ]
+          ))),
+        method
+      };
+      // Pass error if authentication disabled
+      if (opts && opts.noAuth) {
+
+        return {
+          success: false, isNetworkError: !err.response, error: err, context
+        };
+
+      }
 
       // Return networking error
-      if (!err.response)
-        return { success: false, isNetworkError: true, error: err };
+      if (!err.response) {
+
+        return {
+          success: false, isNetworkError: true, error: err, context
+        };
+
+      }
 
       // Pass error if it isn't related to the authentication token
       if (
         err.response.status !== 401 ||
-        (err.response.data.error_type !== 'authorization.unauthorized' && err.response.data.error_type !== 'authorization.token_expired')
-      )
-        return { success: false, isNetworkError: false, error: err };
+        (err.response.data.code !== 'authorization.unauthorized' && err.response.data.code !== 'authorization.token_expired')
+      ) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Pass error if automatical relogin is disabled
-      if (opts && opts.noRelogin)
-        return { success: false, isNetworkError: false, error: err };
+      if (opts && opts.noRelogin) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Try to relogin automatically, pass error if failed
-      if (!await this.reloginAutomatically())
-        return { success: false, isNetworkError: false, error: err };
+      if (!await this.reloginAutomatically()) {
+
+        return {
+          success: false, isNetworkError: false, error: err, context
+        };
+
+      }
 
       // Say hi to recursion!
       return this.post(url, body, Object.assign(opts || {}, { noRelogin: true }));
@@ -482,7 +538,7 @@ class Cattr {
   /**
    * Perform PATCH request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async patch(url, body, opts) {
@@ -494,7 +550,7 @@ class Cattr {
   /**
    * Perform PUT request
    * @param {String}         url  Endpoint location relative to baseURL
-   * @param {Object}         body Object / Formdata to be sent
+   * @param {Object}         body Object to be sent
    * @param {RequestOptions} opts Additional options for this request
    */
   async put(url, body, opts) {

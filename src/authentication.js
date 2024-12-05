@@ -99,11 +99,7 @@ module.exports = $ => {
       if (res.error && res.error instanceof $.ApiError)
         throw res.error;
 
-      throw new $.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new $.ApiError(res);
 
     }
 
@@ -138,11 +134,7 @@ module.exports = $ => {
       if (res.error && res.error instanceof $.ApiError)
         throw res.error;
 
-      throw new $.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new $.ApiError(res);
 
     }
 
@@ -162,20 +154,16 @@ module.exports = $ => {
   ops.logout = async (fromAll = false) => {
 
     const endpoint = (fromAll === true) ? 'auth/logout-from-all' : 'auth/logout';
-    const req = await $.post(endpoint, {}, { noRelogin: true });
-    if (!req.success) {
+    const res = await $.post(endpoint, {}, { noRelogin: true });
+    if (!res.success) {
 
-      if (req.isNetworkError)
-        throw new $.NetworkError(req);
+      if (res.isNetworkError)
+        throw new $.NetworkError(res);
 
-      if (req.error && req.error instanceof $.ApiError)
-        throw req.error;
+      if (res.error && res.error instanceof $.ApiError)
+        throw res.error;
 
-      throw new $.ApiError(
-        req.error.response.status,
-        req.error.response.data.error_type || 'unknown',
-        req.error.response.data.message || 'Unknown message',
-      );
+      throw new $.ApiError(res);
 
     }
 
@@ -191,34 +179,30 @@ module.exports = $ => {
    */
   ops.refresh = async (relogin = false) => {
 
-    const req = await $.post('auth/refresh', {}, { noRelogin: !relogin });
-    if (!req.success) {
+    const res = await $.post('auth/refresh', {}, { noRelogin: !relogin });
+    if (!res.success) {
 
-      if (req.isNetworkError)
-        throw new $.NetworkError(req);
+      if (res.isNetworkError)
+        throw new $.NetworkError(res);
 
-      if (req.error && req.error instanceof $.ApiError)
-        throw req.error;
+      if (res.error && res.error instanceof $.ApiError)
+        throw res.error;
 
-      throw new $.ApiError(
-        req.error.response.status,
-        req.error.response.data.error_type || 'unknown',
-        req.error.response.data.message || 'Unknown message',
-      );
+      throw new $.ApiError(res);
 
     }
 
     if (
-      typeof req.response.data.access_token !== 'string' ||
-      typeof req.response.data.token_type !== 'string' ||
-      typeof req.response.data.expires_in !== 'string'
+      typeof res.response.data.access_token !== 'string' ||
+      typeof res.response.data.token_type !== 'string' ||
+      typeof res.response.data.expires_in !== 'string'
     )
       throw new $.ApiError(0, 'unexpected_structure', 'Incorrect response structure');
 
     return {
-      token: req.response.data.access_token,
-      tokenType: req.response.data.token_type,
-      tokenExpire: new Date(req.response.data.expires_in),
+      token: res.response.data.access_token,
+      tokenType: res.response.data.token_type,
+      tokenExpire: new Date(res.response.data.expires_in),
     };
 
   };
@@ -230,25 +214,23 @@ module.exports = $ => {
    */
   ops.getSingleClickRedirection = async () => {
 
-    const req = await $.get('auth/desktop-key', {});
-    if (!req.success) {
+    const res = await $.get('auth/desktop-key', {});
 
-      if (req.isNetworkError)
-        throw new $.NetworkError(req);
+    if (!res.success) {
 
-      if (req.error && req.error instanceof $.ApiError)
-        throw req.error;
+      if (res.isNetworkError)
+        throw new $.NetworkError(res);
 
-      throw new $.ApiError(
-        req.error.response.status,
-        req.error.response.data.error_type || 'unknown',
-        req.error.response.data.message || 'Unknown message',
-      );
+      if (res.error && res.error instanceof $.ApiError)
+        throw res.error;
+
+      throw new $.ApiError(res);
 
     }
 
     // Extract token properties
-    const { access_token: token, token_type: type, frontend_uri: origin } = req.response.data;
+    const { access_token: token, token_type: type } = res.response.data;
+    const { frontend_uri: origin } = res.response;
 
     // Verify token type
     if (type !== 'desktop')
@@ -288,11 +270,7 @@ module.exports = $ => {
       if (res.error && res.error instanceof $.ApiError)
         throw res.error;
 
-      throw new $.ApiError(
-        res.error.response.status,
-        res.error.response.data.error_type || 'unknown',
-        res.error.response.data.message || 'Unknown message',
-      );
+      throw new $.ApiError(res);
 
     }
 
