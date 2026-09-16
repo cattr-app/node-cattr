@@ -15,6 +15,7 @@ class ApiError extends Error {
    * @param {Object} res Axios response
    */
   constructor(res) {
+
     super();
     this.statusCode = res.error.response?.data?.status ?? res.error.response.status;
     this.code = res.error.response?.data?.error?.code ?? 'unknown error code';
