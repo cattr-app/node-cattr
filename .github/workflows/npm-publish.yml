@@ -19,8 +19,5 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
-      - name: Update npm
-        run: npm install -g npm@latest
-      - run: npm ci
       - run: npm --no-git-tag-version version from-git
       - run: npm publish

@@ -1,6 +1,6 @@
 {
   "name": "@amazingcat/node-cattr",
-  "version": "dev",
+  "version": "0.0.0",
   "description": "Node.js client for Cattr API",
   "main": "index.js",
   "scripts": {
@@ -26,10 +26,10 @@
     "eslint-plugin-import": "^2.26.0"
   },
   "engines": {
-    "node": "~24.21"
+    "node": "~14.19"
   },
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "npm@12.0.2+sha512.b885e890b9418fa1693544d05f53e64f9a73ec194837d4258b15fecdd692347b1dd2a517b1b0cbaf9d31cd8e92c3b70956bd2ecc72833a57b4b3098f5bfa7943"
+  "packageManager": "npm@6.14.18+sha512.a774a3a927214ae35052a6c9060c1dbf42f73ba6ca91a49f42b43326cb2436934a2e0d20dfb739c535c55744aa4e55fd196be81b10442d524c456ab427ca1a2c"
 }
