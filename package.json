@@ -26,10 +26,10 @@
     "eslint-plugin-import": "^2.26.0"
   },
   "engines": {
-    "node": "~14.19"
+    "node": "~14.21"
   },
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "npm@6.14.18+sha512.a774a3a927214ae35052a6c9060c1dbf42f73ba6ca91a49f42b43326cb2436934a2e0d20dfb739c535c55744aa4e55fd196be81b10442d524c456ab427ca1a2c"
+  "packageManager": "npm@9.9.4+sha512.37371088ba6a0ee2e16af772276277b4627f9e2fde6dca87545664bf50b8ffa95b96b6943db3e0089e1585be286b71458516b6623f60039f23187ff3b4ab9e35"
 }
