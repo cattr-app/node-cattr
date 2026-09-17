@@ -1,6 +1,7 @@
 # node-cattr
 
-[![npm](https://img.shields.io/npm/v/@amazingcat/node-cattr.svg)](https://www.npmjs.com/package/@amazingcat/node-cattr)
+[![node](https://img.shields.io/node/v/@amazingcat/node-cattr.svg)](https://www.npmjs.com/package/@amazingcat/node-cattr)
+[![npm](https://img.shields.io/badge/npm-9.9.4-blue.svg)](https://www.npmjs.com/package/@amazingcat/node-cattr)
 [![license](https://img.shields.io/npm/l/@amazingcat/node-cattr.svg)](LICENSE)
 
 The public Node.js SDK for the [Cattr time-tracking platform](https://github.com/cattr-app/server-application). It provides authentication, automatic token renewal, project and task access, time reporting, interval and screenshot submission, activity monitoring, and instance metadata through one CommonJS client.
