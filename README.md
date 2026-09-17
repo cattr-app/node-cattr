@@ -8,7 +8,6 @@ The public Node.js SDK for the [Cattr time-tracking platform](https://github.com
 
 ## Requirements
 
-- Node.js 24.21.x (the version declared by the package)
 - A reachable Cattr server
 - A Cattr user account for authenticated operations
 
